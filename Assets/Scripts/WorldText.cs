@@ -9,7 +9,7 @@ public static class WorldText
         TextAlignment textAlignment = TextAlignment.Center;
         int sortingOrder = sortingOrderDefault;
 
-        GameObject gameObject = new GameObject("World_Text", typeof(TextMesh));
+        GameObject gameObject = new GameObject("Debug", typeof(TextMesh));
         Transform transform = gameObject.transform;
         transform.position = pos;
 
@@ -21,6 +21,7 @@ public static class WorldText
         textMesh.color = color;
         textMesh.GetComponent<MeshRenderer>().sortingOrder = sortingOrder;
 
+        // Sharpen textmesh
         gameObject.AddComponent<TextMeshSharpener>();
         gameObject.transform.localScale = new Vector3(0.05f, 0.05f);
 
