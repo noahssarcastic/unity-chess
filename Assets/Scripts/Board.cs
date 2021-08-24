@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Board : MonoBehaviour {
     private TileMap tileMap;
-    private GameObject[,] tiles;
+    private Tile[,] tiles;
 
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
@@ -13,56 +13,44 @@ public class Board : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         tileMap = new TileMap(width, height, 1);
-        tiles = new GameObject[width, height];
+        tiles = new Tile[width, height];
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                GameObject tile = CreateTile();
+                Tile tile = CreateTile(
+                    string.Format("Tile {0}, {1}", i, j),
+                    new Vector3(i, j)
+                );
                 tiles[i, j] = tile;
+
+                // Render tile
+                tile.SetText(tileMap.GetTile(i, j).ToString());
+                if ((i + j) % 2 == 0) {
+                    tile.SetColor(new Color(87/256f, 58/256f, 46/256f));
+                } else {
+                    tile.SetColor(new Color(252/256f, 204/256f, 116/256f));
+                }
             }
         }
     }
 
     // Update is called once per frame
     void Update() {
-        // if (Input.GetMouseButtonDown(0)) {
-        //     Vector3 offset = gameObject.transform.position;
-        //     Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //     (int, int) clickedTile = tileMap.GetGridCoords(clickCoords);
-        //     tileMap.SetTile(clickedTile.Item1, clickedTile.Item2, 1);
-        // }
-
-        // for (int i = 0; i < width; i++) {
-        //     for (int j = 0; j < height; j++) {
-        //         GameObject tile = tiles[i, j];
-        //         tile.GetComponentInChildren<TextMesh>().text = tileMap.GetTile(i, j).ToString();
-        //     }
-        // }
+        if (Input.GetMouseButtonDown(0)) {
+            // Vector3 offset = gameObject.transform.position;
+            // Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            // (int, int) clickedTile = tileMap.GetGridCoords(clickCoords);
+            // tileMap.SetTile(clickedTile.Item1, clickedTile.Item2, 1);
+        }
     }
 
-    private GameObject CreateTile() {
-        // Create tile
-        GameObject tile = Instantiate(tilePrefab);
-
-        // GameObject tile = new GameObject(string.Format("Tile {0}, {1}", i, j), typeof(SpriteRenderer));
-        // tile.transform.parent = gameObject.transform;
-        // tile.transform.localPosition = new Vector3(i, j);
-
-        // // Render tile
-        // SpriteRenderer sr = tile.GetComponent<SpriteRenderer>();
-        // // sr.sprite = tileSprite;
-        // if ((i+j) % 2 == 0) {
-        //     sr.color = new Color(87/256f, 58/256f, 46/256f);
-        // } else {
-        //     sr.color = new Color(252/256f, 204/256f, 116/256f);
-        // }
-
-        // // Create debug textmesh
-        // TextMesh tm = WorldText.CreateWorldText(
-        //     tileMap.GetTile(i, j).ToString(), 
-        //     tileMap.GetWorldCoords(i, j) + gameObject.transform.position, 
-        //     Color.white);
-        // tm.transform.parent = tile.transform;
-        return tile;
+    private Tile CreateTile(string name, Vector3 position) {
+        GameObject tileGameObject = Instantiate(tilePrefab);
+        tileGameObject.name = name;
+        tileGameObject.transform.parent = gameObject.transform;
+        tileGameObject.transform.localPosition = position;
+        Tile tileController = tileGameObject.AddComponent<Tile>();
+        return tileController;
+        
     }
 }
