@@ -8,11 +8,12 @@ public class Board : MonoBehaviour {
 
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
+    [SerializeField] private float tileSize = 1;
     [SerializeField] private GameObject tilePrefab;
 
     // Start is called before the first frame update
     void Start() {
-        tileMap = new TileMap(width, height, 1);
+        tileMap = new TileMap(width, height, tileSize);
         tiles = new Tile[width, height];
 
         for (int i = 0; i < width; i++) {
@@ -37,10 +38,14 @@ public class Board : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         if (Input.GetMouseButtonDown(0)) {
-            // Vector3 offset = gameObject.transform.position;
-            // Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            // (int, int) clickedTile = tileMap.GetGridCoords(clickCoords);
-            // tileMap.SetTile(clickedTile.Item1, clickedTile.Item2, 1);
+            Vector3 parentOffset = gameObject.transform.position;
+            Vector3 tileSizeOffset = new Vector3(tileSize/2, tileSize/2);
+            Vector3 offset = -parentOffset + tileSizeOffset;
+            Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            (int, int) clickedTile = tileMap.GetGridCoords(clickCoords + offset);
+            tileMap.SetTile(clickedTile.Item1, clickedTile.Item2, 1);
+            tiles[clickedTile.Item1, clickedTile.Item2].SetText("1");
+            tiles[clickedTile.Item1, clickedTile.Item2].SetColor(Color.green);
         }
     }
 

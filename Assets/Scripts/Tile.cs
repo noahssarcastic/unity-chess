@@ -10,7 +10,7 @@ public class Tile : MonoBehaviour
         // Create debug textmesh
         textMesh = WorldText.CreateWorldText(
             "404", 
-            Vector3.zero, 
+            gameObject.transform.position, 
             Color.white);
         textMesh.transform.parent = gameObject.transform;
     }
