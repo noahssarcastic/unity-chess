@@ -20,7 +20,8 @@ public class Board : MonoBehaviour {
             for (int j = 0; j < height; j++) {
                 Tile tile = CreateTile(
                     string.Format("Tile {0}, {1}", i, j),
-                    new Vector3(i, j)
+                    new Vector3(i * tileSize, j * tileSize),
+                    new Vector3(tileSize, tileSize)
                 );
                 tiles[i, j] = tile;
 
@@ -42,6 +43,7 @@ public class Board : MonoBehaviour {
             Vector3 tileSizeOffset = new Vector3(tileSize/2, tileSize/2);
             Vector3 offset = -parentOffset + tileSizeOffset;
             Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
             (int, int) clickedTile = tileMap.GetGridCoords(clickCoords + offset);
             tileMap.SetTile(clickedTile.Item1, clickedTile.Item2, 1);
             tiles[clickedTile.Item1, clickedTile.Item2].SetText("1");
@@ -49,11 +51,12 @@ public class Board : MonoBehaviour {
         }
     }
 
-    private Tile CreateTile(string name, Vector3 position) {
+    private Tile CreateTile(string name, Vector3 position, Vector3 scale) {
         GameObject tileGameObject = Instantiate(tilePrefab);
         tileGameObject.name = name;
         tileGameObject.transform.parent = gameObject.transform;
         tileGameObject.transform.localPosition = position;
+        tileGameObject.transform.localScale = scale;
         Tile tileController = tileGameObject.AddComponent<Tile>();
         return tileController;
         
