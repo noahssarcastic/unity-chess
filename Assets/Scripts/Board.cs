@@ -5,6 +5,8 @@ using UnityEngine;
 public class Board : MonoBehaviour {
     private TileMap tileMap;
     private Tile[,] tiles;
+    private Coords<int> selectedTile;
+    private bool isTileSelected;
 
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
@@ -15,6 +17,8 @@ public class Board : MonoBehaviour {
     void Start() {
         tileMap = new TileMap(width, height, tileSize);
         tiles = new Tile[width, height];
+        selectedTile = new Coords<int>();
+        isTileSelected = false;
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
@@ -44,10 +48,28 @@ public class Board : MonoBehaviour {
             Vector3 offset = -parentOffset + tileSizeOffset;
             Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            (int, int) clickedTile = tileMap.GetGridCoords(clickCoords + offset);
-            tileMap.SetTile(clickedTile.Item1, clickedTile.Item2, 1);
-            tiles[clickedTile.Item1, clickedTile.Item2].SetText("1");
-            tiles[clickedTile.Item1, clickedTile.Item2].SetColor(Color.green);
+            Coords<int> clickedTile = tileMap.GetGridCoords(clickCoords + offset);
+            OnClick(clickedTile);
+        }
+    }
+
+    private void OnClick(Coords<int> clickedTile) {
+        if (!tileMap.InBounds(clickedTile.X, clickedTile.Y)) {
+            return;
+        }
+
+        if (!isTileSelected) {
+            tiles[clickedTile.X, clickedTile.Y].SelectTile();
+            isTileSelected = true;
+            selectedTile = clickedTile;
+        } else if (selectedTile.Equals(clickedTile)) {
+            tiles[selectedTile.X, selectedTile.Y].UnselectTile();
+            isTileSelected = false;
+        } else {
+            tiles[selectedTile.X, selectedTile.Y].UnselectTile();
+
+            tiles[clickedTile.X, clickedTile.Y].SelectTile();
+            selectedTile = clickedTile;
         }
     }
 

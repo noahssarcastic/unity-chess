@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TileMap
@@ -40,10 +38,18 @@ public class TileMap
         return new Vector3(x, y) * TileSize;
     }
 
-    public (int, int) GetGridCoords(Vector3 pos) {
-        return (
+    public Coords<int> GetGridCoords(Vector3 pos) {
+        return new Coords<int>(
             Mathf.FloorToInt(pos.x / TileSize), 
             Mathf.FloorToInt(pos.y / TileSize)
         );
+    }
+
+    public bool InBounds(int x, int y) {
+        if (x < 0) return false;
+        if (x >= Width) return false;
+        if (y < 0) return false;
+        if (y >= Height) return false;
+        return true;
     }
 }
