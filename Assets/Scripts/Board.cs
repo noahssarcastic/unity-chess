@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Board : MonoBehaviour {
-    private TileMap tileMap;
+    private TileMap<int> tileMap;
     private Tile[,] tiles;
     private Coords<int> selectedTile;
     private bool isTileSelected;
@@ -21,7 +21,7 @@ public class Board : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        tileMap = new TileMap(width, height, tileSize, -1);
+        tileMap = new TileMap<int>(width, height, tileSize, -1);
         tiles = new Tile[width, height];
 
         selectedTile = new Coords<int>();
@@ -80,21 +80,26 @@ public class Board : MonoBehaviour {
             return;
         }
 
-        GameObject selectedCharacter = characters[tileMap.GetTile(clickedTile)];
-
-        if (!isTileSelected) {
-            tiles[clickedTile.X, clickedTile.Y].SelectTile();
-            isTileSelected = true;
-            selectedTile = clickedTile;
-        } else if (selectedTile.Equals(clickedTile)) {
-            tiles[selectedTile.X, selectedTile.Y].UnselectTile();
-            isTileSelected = false;
-        } else {
-            tiles[selectedTile.X, selectedTile.Y].UnselectTile();
-
-            tiles[clickedTile.X, clickedTile.Y].SelectTile();
-            selectedTile = clickedTile;
+        int characterIndex = tileMap.GetTile(clickedTile);
+        if (characterIndex >= 0) {
+            GameObject selectedCharacter = characters[characterIndex];
+            SpriteRenderer spriteRenderer = selectedCharacter.GetComponent<SpriteRenderer>();
+            spriteRenderer.color = Color.red;
         }
+
+        // if (!isTileSelected) {
+        //     tiles[clickedTile.X, clickedTile.Y].SelectTile();
+        //     isTileSelected = true;
+        //     selectedTile = clickedTile;
+        // } else if (selectedTile.Equals(clickedTile)) {
+        //     tiles[selectedTile.X, selectedTile.Y].UnselectTile();
+        //     isTileSelected = false;
+        // } else {
+        //     tiles[selectedTile.X, selectedTile.Y].UnselectTile();
+
+        //     tiles[clickedTile.X, clickedTile.Y].SelectTile();
+        //     selectedTile = clickedTile;
+        // }
     }
 
     private Tile CreateTile(string name, Vector3 position, Vector3 scale) {

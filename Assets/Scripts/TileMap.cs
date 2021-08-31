@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class TileMap
+public class TileMap<T>
 {
     // Member variables
 
-    private float[,] tiles;
+    private T[,] tiles;
 
     // Properties
 
@@ -21,15 +21,15 @@ public class TileMap
         Width = x;
         Height = y;
         TileSize = size;
-        tiles = new float[x, y];
+        tiles = new T[x, y];
     }
 
-    public TileMap(int x, int y, float size, int defaultValue)
+    public TileMap(int x, int y, float size, T defaultValue)
     {
         Width = x;
         Height = y;
         TileSize = size;
-        tiles = new float[x, y];
+        tiles = new T[x, y];
         for (int i = 0; i < Width; i++) {
             for (int j = 0; j < Height; j++) {
                 tiles[i, j] = defaultValue;
@@ -39,19 +39,19 @@ public class TileMap
     
     // Methods
 
-    public float GetTile(int x, int y) {
+    public T GetTile(int x, int y) {
         return tiles[x, y];
     }
 
-    public float GetTile(Coords<int> coords) {
+    public T GetTile(Coords<int> coords) {
         return tiles[coords.X, coords.Y];
     }
 
-    public void SetTile(int x, int y, float value) {
+    public void SetTile(int x, int y, T value) {
         tiles[x, y] = value;
     }
 
-    public void SetTile(Coords<int> coords, float value) {
+    public void SetTile(Coords<int> coords, T value) {
         tiles[coords.X, coords.Y] = value;
     }
 
