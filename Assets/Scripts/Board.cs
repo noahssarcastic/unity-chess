@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Board : MonoBehaviour {
-    private TileMap<int> tileMap;
+    private TileMap<int> characterMap;
     private Tile[,] tiles;
     private Coords<int> selectedTile;
     private bool isTileSelected;
@@ -21,7 +21,8 @@ public class Board : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start() {
-        tileMap = new TileMap<int>(width, height, tileSize, -1);
+        characters = new GameObject[10];
+        characterMap = new TileMap<int>(width, height, tileSize, -1);
         tiles = new Tile[width, height];
 
         selectedTile = new Coords<int>();
@@ -32,13 +33,12 @@ public class Board : MonoBehaviour {
             for (int j = 0; j < height; j++) {
                 Tile tile = CreateTile(
                     string.Format("Tile {0}, {1}", i, j),
-                    tileMap.GetWorldCoords(i, j),
+                    characterMap.GetWorldCoords(i, j),
                     new Vector3(tileSize, tileSize)
                 );
                 tiles[i, j] = tile;
 
-                // Render tile
-                tile.SetText(tileMap.GetTile(i, j).ToString());
+                // Create checkerboard pattern
                 if ((i + j) % 2 == 0) {
                     tile.SetColor(new Color(87/256f, 58/256f, 46/256f));
                 } else {
@@ -47,13 +47,11 @@ public class Board : MonoBehaviour {
             }
         }
 
-        characters = new GameObject[10];
-
         // Setup player
         int playerIndex = 0;
         Coords<int> startingCoords = new Coords<int>(startingX, startingY);
         characters[playerIndex] = player;
-        tileMap.SetTile(startingCoords, playerIndex);
+        characterMap.SetTile(startingCoords, playerIndex);
         MoveCharacter(playerIndex, startingCoords);
     }
 
@@ -65,41 +63,57 @@ public class Board : MonoBehaviour {
             Vector3 offset = -parentOffset + tileSizeOffset;
             Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            Coords<int> clickedTile = tileMap.GetGridCoords(clickCoords + offset);
+            Coords<int> clickedTile = characterMap.GetGridCoords(clickCoords + offset);
             OnClick(clickedTile);
         }
     }
 
     private void MoveCharacter(int characterIndex, Coords<int> newPosition) {
+        Debug.Log("Move!");
+        Debug.Log(characterIndex);
         GameObject character = characters[characterIndex];
-        character.transform.localPosition = tileMap.GetWorldCoords(newPosition);
+        character.transform.localPosition = characterMap.GetWorldCoords(newPosition);
     }
 
     private void OnClick(Coords<int> clickedTile) {
-        if (!tileMap.InBounds(clickedTile)) {
+        if (!characterMap.InBounds(clickedTile)) {
             return;
         }
 
-        int characterIndex = tileMap.GetTile(clickedTile);
-        if (characterIndex >= 0) {
-            GameObject selectedCharacter = characters[characterIndex];
-            SpriteRenderer spriteRenderer = selectedCharacter.GetComponent<SpriteRenderer>();
-            spriteRenderer.color = Color.red;
-        }
+        int clickedTileValue = characterMap.GetTile(clickedTile);
+        bool isCharacter = clickedTileValue >= 0;
+        bool isSameTile = selectedTile.Equals(clickedTile);
 
-        // if (!isTileSelected) {
-        //     tiles[clickedTile.X, clickedTile.Y].SelectTile();
-        //     isTileSelected = true;
-        //     selectedTile = clickedTile;
-        // } else if (selectedTile.Equals(clickedTile)) {
-        //     tiles[selectedTile.X, selectedTile.Y].UnselectTile();
-        //     isTileSelected = false;
-        // } else {
-        //     tiles[selectedTile.X, selectedTile.Y].UnselectTile();
+        if (isTileSelected) {
+            if (isSameTile) {
+                // Unselect tile
+                Unselect();
+                return;
+            }
 
-        //     tiles[clickedTile.X, clickedTile.Y].SelectTile();
-        //     selectedTile = clickedTile;
-        // }
+            if (!isSameTile && isCharacter) {
+                // Switch selection
+                Unselect();
+                SelectTile(clickedTile);
+                return;
+            }
+
+            if (!isSameTile && !isCharacter) {
+                // Move character
+                int selectedTileValue = characterMap.GetTile(selectedTile);
+                characterMap.SetTile(selectedTile, -1);
+                characterMap.SetTile(clickedTile, selectedTileValue);
+                Unselect();
+                MoveCharacter(selectedTileValue, clickedTile);
+                return;
+            }
+        } else {
+            if (isCharacter) {
+                // Select tile
+                SelectTile(clickedTile);
+                return;
+            }
+        }    
     }
 
     private Tile CreateTile(string name, Vector3 position, Vector3 scale) {
@@ -111,5 +125,24 @@ public class Board : MonoBehaviour {
         Tile tileController = tileGameObject.AddComponent<Tile>();
         return tileController;
         
+    }
+
+    private Tile GetTile(int x, int y) {
+        return tiles[x, y];
+    }
+
+    private Tile GetTile(Coords<int> coords) {
+        return tiles[coords.X, coords.Y];
+    }
+
+    private void SelectTile(Coords<int> coords) {
+        GetTile(coords).SelectTile();
+        selectedTile = coords;
+        isTileSelected = true;
+    }
+
+    private void Unselect() {
+        tiles[selectedTile.X, selectedTile.Y].UnselectTile();
+        isTileSelected = false;
     }
 }
