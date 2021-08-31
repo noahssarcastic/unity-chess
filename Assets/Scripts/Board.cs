@@ -19,6 +19,10 @@ public class Board : MonoBehaviour {
     [SerializeField] private int startingX;
     [SerializeField] private int startingY;
 
+    [SerializeField] private GameObject player2;
+    [SerializeField] private int startingX2;
+    [SerializeField] private int startingY2;
+
     // Start is called before the first frame update
     void Start() {
         characters = new GameObject[10];
@@ -53,6 +57,13 @@ public class Board : MonoBehaviour {
         characters[playerIndex] = player;
         characterMap.SetTile(startingCoords, playerIndex);
         MoveCharacter(playerIndex, startingCoords);
+
+        // Setup player 2
+        int playerIndex2 = 1;
+        Coords<int> startingCoords2 = new Coords<int>(startingX2, startingY2);
+        characters[playerIndex2] = player2;
+        characterMap.SetTile(startingCoords2, playerIndex2);
+        MoveCharacter(playerIndex2, startingCoords2);
     }
 
     // Update is called once per frame
@@ -69,8 +80,6 @@ public class Board : MonoBehaviour {
     }
 
     private void MoveCharacter(int characterIndex, Coords<int> newPosition) {
-        Debug.Log("Move!");
-        Debug.Log(characterIndex);
         GameObject character = characters[characterIndex];
         character.transform.localPosition = characterMap.GetWorldCoords(newPosition);
     }
