@@ -8,23 +8,31 @@ public class Board : MonoBehaviour {
     private Coords<int> selectedTile;
     private bool isTileSelected;
 
+    private GameObject[] characters;
+
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
     [SerializeField] private float tileSize = 1;
     [SerializeField] private GameObject tilePrefab;
 
+    [SerializeField] private GameObject player;
+    [SerializeField] private int startingX;
+    [SerializeField] private int startingY;
+
     // Start is called before the first frame update
     void Start() {
-        tileMap = new TileMap(width, height, tileSize);
+        tileMap = new TileMap(width, height, tileSize, -1);
         tiles = new Tile[width, height];
+
         selectedTile = new Coords<int>();
         isTileSelected = false;
 
+        // Render board
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 Tile tile = CreateTile(
                     string.Format("Tile {0}, {1}", i, j),
-                    new Vector3(i * tileSize, j * tileSize),
+                    tileMap.GetWorldCoords(i, j),
                     new Vector3(tileSize, tileSize)
                 );
                 tiles[i, j] = tile;
@@ -38,6 +46,15 @@ public class Board : MonoBehaviour {
                 }
             }
         }
+
+        characters = new GameObject[10];
+
+        // Setup player
+        int playerIndex = 0;
+        Coords<int> startingCoords = new Coords<int>(startingX, startingY);
+        characters[playerIndex] = player;
+        tileMap.SetTile(startingCoords, playerIndex);
+        MoveCharacter(playerIndex, startingCoords);
     }
 
     // Update is called once per frame
@@ -53,10 +70,17 @@ public class Board : MonoBehaviour {
         }
     }
 
+    private void MoveCharacter(int characterIndex, Coords<int> newPosition) {
+        GameObject character = characters[characterIndex];
+        character.transform.localPosition = tileMap.GetWorldCoords(newPosition);
+    }
+
     private void OnClick(Coords<int> clickedTile) {
-        if (!tileMap.InBounds(clickedTile.X, clickedTile.Y)) {
+        if (!tileMap.InBounds(clickedTile)) {
             return;
         }
+
+        GameObject selectedCharacter = characters[tileMap.GetTile(clickedTile)];
 
         if (!isTileSelected) {
             tiles[clickedTile.X, clickedTile.Y].SelectTile();
