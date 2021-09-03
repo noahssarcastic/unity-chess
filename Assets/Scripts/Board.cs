@@ -1,31 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Board : MonoBehaviour {
+public class Board : MonoBehaviour, ISaveable {
     private TileMap<int> characterMap;
     private Tile[,] tiles;
     private Coords<int> selectedTile;
     private bool isTileSelected;
 
-    private GameObject[] characters;
+    private Character[] characters;
+    private int numCharacters;
 
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
     [SerializeField] private float tileSize = 1;
     [SerializeField] private GameObject tilePrefab;
 
-    [SerializeField] private GameObject player;
-    [SerializeField] private int startingX;
-    [SerializeField] private int startingY;
-
-    [SerializeField] private GameObject player2;
-    [SerializeField] private int startingX2;
-    [SerializeField] private int startingY2;
-
     // Start is called before the first frame update
     void Start() {
-        characters = new GameObject[10];
+        characters = new Character[10];
+        numCharacters = 0;
         characterMap = new TileMap<int>(width, height, tileSize, -1);
         tiles = new Tile[width, height];
 
@@ -51,19 +43,9 @@ public class Board : MonoBehaviour {
             }
         }
 
-        // Setup player
-        int playerIndex = 0;
-        Coords<int> startingCoords = new Coords<int>(startingX, startingY);
-        characters[playerIndex] = player;
-        characterMap.SetTile(startingCoords, playerIndex);
-        MoveCharacter(playerIndex, startingCoords);
 
-        // Setup player 2
-        int playerIndex2 = 1;
-        Coords<int> startingCoords2 = new Coords<int>(startingX2, startingY2);
-        characters[playerIndex2] = player2;
-        characterMap.SetTile(startingCoords2, playerIndex2);
-        MoveCharacter(playerIndex2, startingCoords2);
+        SpawnCharacter(new Coords<int>(0, 0), ClassName.King);
+        SpawnCharacter(new Coords<int>(0, 1), ClassName.Queen);
     }
 
     // Update is called once per frame
@@ -80,8 +62,8 @@ public class Board : MonoBehaviour {
     }
 
     private void MoveCharacter(int characterIndex, Coords<int> newPosition) {
-        GameObject character = characters[characterIndex];
-        character.transform.localPosition = characterMap.GetWorldCoords(newPosition);
+        Character character = characters[characterIndex];
+        character.Move(characterMap.GetWorldCoords(newPosition));
     }
 
     private void OnClick(Coords<int> clickedTile) {
@@ -153,5 +135,46 @@ public class Board : MonoBehaviour {
     private void Unselect() {
         tiles[selectedTile.X, selectedTile.Y].UnselectTile();
         isTileSelected = false;
+    }
+
+    public void SpawnCharacter(Coords<int> startingPosition, ClassName className) {
+        if (numCharacters > characters.Length) {
+            Debug.LogError("Too many characters, cannot spawn more.");
+            return;
+        }
+
+        if (characterMap.GetTile(startingPosition) >= 0) {
+            Debug.LogError("Cannot spawn character on top of another.");
+            return;
+        }
+
+        // Create character object
+        GameObject characterPrefab = CharacterClass.GetClassPrefab(className);
+        GameObject characterGameObject = Instantiate(characterPrefab);
+        Character character = characterGameObject.AddComponent<Character>();
+        character.Move(characterMap.GetWorldCoords(startingPosition));
+
+        // Add character to board and characterMap
+        characterMap.SetTile(startingPosition, numCharacters);
+        characters[numCharacters] = character;
+        numCharacters++;
+    }
+
+    public void SpawnCharacter(CharacterData characterData) {
+        Coords<int> startingPosition = characterData.position;
+        ClassName className = characterData.className;
+        SpawnCharacter(startingPosition, className);
+    }
+
+    public void PopulateSaveData(SaveData saveData) {
+        // foreach (var character in characters) {
+        //     if (character is null) continue;
+        //     Coords<int> characterPosition = characterMap.GetGridCoords(character.GetPosition());
+        //     saveData.characters.Add(new CharacterData() {position=characterPosition});
+        // }
+    }
+
+    public void LoadFromSaveData(SaveData a_SaveData) {
+
     }
 }
