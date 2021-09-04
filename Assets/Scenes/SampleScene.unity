@@ -253,9 +253,3 @@ MonoBehaviour:
   height: 8
   tileSize: 1
   tilePrefab: {fileID: 4647443434032532744, guid: 1de55ee2ef11e4043ad1d3f2698dc46e, type: 3}
-  player: {fileID: 0}
-  startingX: 0
-  startingY: 0
-  player2: {fileID: 0}
-  startingX2: 1
-  startingY2: 0

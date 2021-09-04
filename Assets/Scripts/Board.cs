@@ -16,7 +16,7 @@ public class Board : MonoBehaviour, ISaveable {
 
     // Start is called before the first frame update
     void Start() {
-        characters = new Character[10];
+        characters = new Character[20];
         numCharacters = 0;
         characterMap = new TileMap<int>(width, height, tileSize, -1);
         tiles = new Tile[width, height];
@@ -44,8 +44,22 @@ public class Board : MonoBehaviour, ISaveable {
         }
 
 
-        SpawnCharacter(new Coords<int>(0, 0), ClassName.King);
-        SpawnCharacter(new Coords<int>(0, 1), ClassName.Queen);
+        SpawnCharacter(new Coords<int>(0, 0), ClassName.Rook);
+        SpawnCharacter(new Coords<int>(1, 0), ClassName.Knight);
+        SpawnCharacter(new Coords<int>(2, 0), ClassName.Bishop);
+        SpawnCharacter(new Coords<int>(3, 0), ClassName.Queen);
+        SpawnCharacter(new Coords<int>(4, 0), ClassName.King);
+        SpawnCharacter(new Coords<int>(5, 0), ClassName.Bishop);
+        SpawnCharacter(new Coords<int>(6, 0), ClassName.Knight);
+        SpawnCharacter(new Coords<int>(7, 0), ClassName.Rook);
+        SpawnCharacter(new Coords<int>(0, 1), ClassName.Pawn);
+        SpawnCharacter(new Coords<int>(1, 1), ClassName.Pawn);
+        SpawnCharacter(new Coords<int>(2, 1), ClassName.Pawn);
+        SpawnCharacter(new Coords<int>(3, 1), ClassName.Pawn);
+        SpawnCharacter(new Coords<int>(4, 1), ClassName.Pawn);
+        SpawnCharacter(new Coords<int>(5, 1), ClassName.Pawn);
+        SpawnCharacter(new Coords<int>(6, 1), ClassName.Pawn);
+        SpawnCharacter(new Coords<int>(7, 1), ClassName.Pawn);
     }
 
     // Update is called once per frame
@@ -61,9 +75,25 @@ public class Board : MonoBehaviour, ISaveable {
         }
     }
 
-    private void MoveCharacter(int characterIndex, Coords<int> newPosition) {
+    private void Move(Coords<int> oldPosition, Coords<int> newPosition) {
+        int characterIndex = characterMap.GetTile(oldPosition);
         Character character = characters[characterIndex];
+        CharacterClass characterClass = character.characterClass;
+        
+        if (!characterClass.CanMove(oldPosition, newPosition)) {
+            Debug.LogError("Character cannot move this way.");
+            return;
+        } 
+
+        // Update game object
         character.Move(characterMap.GetWorldCoords(newPosition));
+
+        // Update character map
+        characterMap.SetTile(oldPosition, -1);
+        characterMap.SetTile(newPosition, characterIndex);
+
+        // Update board
+        Unselect();
     }
 
     private void OnClick(Coords<int> clickedTile) {
@@ -91,11 +121,7 @@ public class Board : MonoBehaviour, ISaveable {
 
             if (!isSameTile && !isCharacter) {
                 // Move character
-                int selectedTileValue = characterMap.GetTile(selectedTile);
-                characterMap.SetTile(selectedTile, -1);
-                characterMap.SetTile(clickedTile, selectedTileValue);
-                Unselect();
-                MoveCharacter(selectedTileValue, clickedTile);
+                Move(selectedTile, clickedTile);
                 return;
             }
         } else {
@@ -152,6 +178,7 @@ public class Board : MonoBehaviour, ISaveable {
         GameObject characterPrefab = CharacterClass.GetClassPrefab(className);
         GameObject characterGameObject = Instantiate(characterPrefab);
         Character character = characterGameObject.AddComponent<Character>();
+        character.characterClass = new CharacterClass(className);
         character.Move(characterMap.GetWorldCoords(startingPosition));
 
         // Add character to board and characterMap
