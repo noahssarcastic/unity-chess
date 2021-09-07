@@ -196,12 +196,14 @@ public class Board : MonoBehaviour, ISaveable {
         SpawnCharacter(startingPosition, className);
     }
 
-    public void GetCenter() {
+    public Vector3 GetCenter() {
         Vector3 boundingBox = new Vector3(width*tileSize, height*tileSize);
         Vector3 pivotOffset = new Vector3(tileSize/2, tileSize/2);
         Vector3 offset = transform.position - pivotOffset;
         // MyDebug.DrawRect(Vector3.zero + offset, boundingBox + offset, Color.red);
-        
+        Vector3 center = (boundingBox/2) + offset;
+        // MyDebug.DrawRect(center + new Vector3(-0.1f, -0.1f), center + new Vector3(0.1f, 0.1f), Color.red);
+        return center;
     }
 
     public void PopulateSaveData(SaveData saveData) {

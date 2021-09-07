@@ -2,21 +2,21 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
-    [SerializeField] private GameObject lookAtGameObject;
+    [SerializeField] private Board board;
 
     private Camera myCamera;
+    private Vector3 boardCenter;
 
     void Awake() {
         myCamera = GetComponent<Camera>();
+        boardCenter = board.GetCenter();
     }
 
     void Start() {
-        // LookAtGameObject();
+        LookAt(boardCenter);
     }
 
-    void Update() {
-        
-    }
+    void Update() {}
 
     public void LookAt(Vector3 lookAtPoint) {
         Vector2 lookAtPoint2D = lookAtPoint;
