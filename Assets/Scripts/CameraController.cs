@@ -14,6 +14,8 @@ public class CameraController : MonoBehaviour {
 
     void Start() {
         LookAt(boardCenter);
+        board.Focus.RemoveAllListeners();
+        board.Focus.AddListener(LookAt);
     }
 
     void Update() {}
