@@ -43,7 +43,6 @@ public class Board : MonoBehaviour, ISaveable {
             }
         }
 
-
         SpawnCharacter(new Coords<int>(0, 0), ClassName.Rook);
         SpawnCharacter(new Coords<int>(1, 0), ClassName.Knight);
         SpawnCharacter(new Coords<int>(2, 0), ClassName.Bishop);
@@ -64,6 +63,8 @@ public class Board : MonoBehaviour, ISaveable {
 
     // Update is called once per frame
     void Update() {
+        GetCenter();
+
         if (Input.GetMouseButtonDown(0)) {
             Vector3 parentOffset = gameObject.transform.position;
             Vector3 tileSizeOffset = new Vector3(tileSize/2, tileSize/2);
@@ -174,12 +175,14 @@ public class Board : MonoBehaviour, ISaveable {
             return;
         }
 
+        Vector3 offset = transform.position;
+
         // Create character object
         GameObject characterPrefab = CharacterClass.GetClassPrefab(className);
         GameObject characterGameObject = Instantiate(characterPrefab);
         Character character = characterGameObject.AddComponent<Character>();
         character.characterClass = new CharacterClass(className);
-        character.Move(characterMap.GetWorldCoords(startingPosition));
+        character.Move(characterMap.GetWorldCoords(startingPosition) + offset);
 
         // Add character to board and characterMap
         characterMap.SetTile(startingPosition, numCharacters);
@@ -191,6 +194,14 @@ public class Board : MonoBehaviour, ISaveable {
         Coords<int> startingPosition = characterData.position;
         ClassName className = characterData.className;
         SpawnCharacter(startingPosition, className);
+    }
+
+    public void GetCenter() {
+        Vector3 boundingBox = new Vector3(width*tileSize, height*tileSize);
+        Vector3 pivotOffset = new Vector3(tileSize/2, tileSize/2);
+        Vector3 offset = transform.position - pivotOffset;
+        // MyDebug.DrawRect(Vector3.zero + offset, boundingBox + offset, Color.red);
+        
     }
 
     public void PopulateSaveData(SaveData saveData) {
