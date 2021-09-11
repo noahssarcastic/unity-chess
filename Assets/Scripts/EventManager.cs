@@ -4,13 +4,18 @@ using UnityEngine.Events;
 using UnityEngine.Assertions;
 
 
+public enum EventName {
+    FocusOnPiece
+}
+
+
 public class EventManager: MonoBehaviour {
 
-    private Dictionary<string, UnityEvent> _eventDictionary;
+    private Dictionary<EventName, UnityEvent> _eventDictionary;
 
     private void Initialize() {
         if (_eventDictionary == null) {
-            _eventDictionary = new Dictionary<string, UnityEvent>();
+            _eventDictionary = new Dictionary<EventName, UnityEvent>();
         }
     }
 
@@ -31,13 +36,13 @@ public class EventManager: MonoBehaviour {
         _instance.Initialize();
     }
 
-    public static UnityEvent GetEvent(string eventName) {
+    public static UnityEvent GetEvent(EventName eventName) {
         UnityEvent thisEvent = null;
         Instance._eventDictionary.TryGetValue(eventName, out thisEvent);
         return thisEvent;
     }
 
-    public static UnityEvent GetOrCreateEvent(string eventName) {
+    public static UnityEvent GetOrCreateEvent(EventName eventName) {
         UnityEvent thisEvent = GetEvent(eventName);
         if (thisEvent == null) {
             thisEvent = new UnityEvent();
@@ -46,19 +51,19 @@ public class EventManager: MonoBehaviour {
         return thisEvent;
     }
 
-    public static void AddListener(string eventName, UnityAction listener) {
+    public static void AddListener(EventName eventName, UnityAction listener) {
         UnityEvent thisEvent = GetOrCreateEvent(eventName);
         thisEvent.AddListener(listener);
     }
 
-    public static void RemoveListener(string eventName, UnityAction listener) {
+    public static void RemoveListener(EventName eventName, UnityAction listener) {
         UnityEvent thisEvent = GetEvent(eventName);
         if (thisEvent != null) {
             thisEvent.RemoveListener(listener);
         }
     }
 
-    public static void Invoke(string eventName) {
+    public static void Invoke(EventName eventName) {
         UnityEvent thisEvent = GetEvent(eventName);
         if (thisEvent != null) {
             thisEvent.Invoke();
