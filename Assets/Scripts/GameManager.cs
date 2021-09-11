@@ -1,18 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+
+public class GameManager: MonoBehaviour {
+
+    void Start() {
+        EventManager.AddListener("TEST_EVENT", TestEvent);
+        EventManager.Invoke("TEST_EVENT");
+        EventManager.AddListener("TEST_EVENT", TestEvent2);
+        EventManager.Invoke("TEST_EVENT");
+        EventManager.RemoveListener("TEST_EVENT", TestEvent);
+        EventManager.Invoke("TEST_EVENT");
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void TestEvent() {
+        Debug.Log("TestEvent");
+    }
+    public void TestEvent2() {
+        Debug.Log("TestEvent2");
     }
 }

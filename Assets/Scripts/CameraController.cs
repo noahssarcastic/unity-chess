@@ -1,10 +1,10 @@
 using UnityEngine;
 
+
 public class CameraController : MonoBehaviour {
 
     [SerializeField] private Board board;
     [SerializeField] private Vector3 offset;
-
     private Camera myCamera;
     private Vector3 boardCenter;
 
@@ -15,8 +15,6 @@ public class CameraController : MonoBehaviour {
 
     void Start() {
         LookAt(boardCenter + offset);
-        // board.Focus.RemoveAllListeners();
-        // board.Focus.AddListener(LookAt);
     }
 
     void Update() {}

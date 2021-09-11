@@ -1,7 +1,8 @@
 using UnityEngine;
-using UnityEngine.Events;
+
 
 public class Board : MonoBehaviour, ISaveable {
+    
     private TileMap<int> characterMap;
     private Tile[,] tiles;
     private Coords<int> selectedTile;
@@ -10,21 +11,11 @@ public class Board : MonoBehaviour, ISaveable {
     private Character[] characters;
     private int numCharacters;
 
-    public Vector3Event Focus { get; private set; }
-
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
     [SerializeField] private float tileSize = 1;
     [SerializeField] private GameObject tilePrefab;
 
-    [System.Serializable]
-    public class Vector3Event: UnityEvent<Vector3> {}
-
-    void Awake() {
-        Focus = new Vector3Event();
-    }
-
-    // Start is called before the first frame update
     void Start() {
         characters = new Character[20];
         numCharacters = 0;
@@ -105,8 +96,6 @@ public class Board : MonoBehaviour, ISaveable {
 
         // Update board
         Unselect();
-        Focus.Invoke(GetCenter());
-
     }
 
     private void OnClick(Coords<int> clickedTile) {
@@ -169,13 +158,11 @@ public class Board : MonoBehaviour, ISaveable {
         GetTile(coords).SelectTile();
         selectedTile = coords;
         isTileSelected = true;
-        Focus.Invoke(characterMap.GetWorldCoords(coords));
     }
 
     private void Unselect() {
         tiles[selectedTile.X, selectedTile.Y].UnselectTile();
         isTileSelected = false;
-        Focus.Invoke(GetCenter());
     }
 
     public void SpawnCharacter(Coords<int> startingPosition, ClassName className) {
