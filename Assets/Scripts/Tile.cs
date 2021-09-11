@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Tile : MonoBehaviour
+public class Tile : MonoBehaviour, IHasDetails
 {
     private TextMesh textMesh;
     private SpriteRenderer sprite;
@@ -37,6 +37,10 @@ public class Tile : MonoBehaviour
     public void UnselectTile() {
         isSelected = false;
         sprite.color = unselectedColor;
+    }
+
+    public string GetDetails() {
+        return string.Format("A {0} tile. Not much else here.", unselectedColor);
     }
     
 }

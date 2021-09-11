@@ -107,32 +107,15 @@ public class Board : MonoBehaviour, ISaveable {
         bool isCharacter = clickedTileValue >= 0;
         bool isSameTile = selectedTile.Equals(clickedTile);
 
-        if (isTileSelected) {
-            if (isSameTile) {
-                // Unselect tile
-                Unselect();
-                return;
-            }
-
-            if (!isSameTile && isCharacter) {
-                // Switch selection
-                Unselect();
-                SelectTile(clickedTile);
-                return;
-            }
-
-            if (!isSameTile && !isCharacter) {
-                // Move character
-                Move(selectedTile, clickedTile);
-                return;
-            }
+        if (isTileSelected && isSameTile) {
+            // Unselect tile
+            Unselect();
         } else {
-            if (isCharacter) {
-                // Select tile
-                SelectTile(clickedTile);
-                return;
-            }
-        }    
+            // Select tile
+            Unselect();
+            SelectTile(clickedTile);
+            EventManager.Invoke(EventName.SelectTile);
+        }
     }
 
     private Tile CreateTile(string name, Vector3 position, Vector3 scale) {
@@ -217,5 +200,26 @@ public class Board : MonoBehaviour, ISaveable {
 
     public void LoadFromSaveData(SaveData a_SaveData) {
 
+    }
+
+    public Character GetSelectedCharacter() {
+        if (!isTileSelected) return null;
+        int selectedTileValue = characterMap.GetTile(selectedTile);
+        if (selectedTileValue < 0) return null;
+        return characters[selectedTileValue];
+    }
+
+    public bool IsCharacterSelected() {
+        if (!isTileSelected) return false;
+        int selectedTileValue = characterMap.GetTile(selectedTile);
+        if (selectedTileValue >= 0) return true;
+        else return false;
+    }
+
+    public IHasDetails GetSelectedObject() {
+        if (!isTileSelected) return null;
+
+        if (IsCharacterSelected()) return characters[characterMap.GetTile(selectedTile)];
+        else return GetTile(selectedTile);
     }
 }

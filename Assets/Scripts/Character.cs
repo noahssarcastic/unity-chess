@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class Character: MonoBehaviour, IHasDetails
 {
     [SerializeField] private Stat armor;
 
@@ -14,4 +14,7 @@ public class Character : MonoBehaviour
         return gameObject.transform.position;
     }
 
+    public string GetDetails() {
+        return string.Format("A {0} named {1}.", characterClass.ToString(), gameObject.name);
+    }
 }

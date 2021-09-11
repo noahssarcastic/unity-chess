@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 
 
 public enum EventName {
-    FocusOnPiece
+    SelectTile
 }
 
 
