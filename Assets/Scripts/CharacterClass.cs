@@ -1,38 +1,43 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
+
 public enum ClassName {
-    King, 
-    Queen,
-    Rook,
-    Bishop,
-    Knight,
-    Pawn
+    [Description("King")]   King, 
+    [Description("Queen")]  Queen,
+    [Description("Rook")]   Rook,
+    [Description("Bishop")] Bishop,
+    [Description("Knight")] Knight,
+    [Description("Pawn")]   Pawn
 }
+
 
 public class CharacterClass {
 
     private static Dictionary<ClassName, GameObject> classPrefabs = new Dictionary<ClassName, GameObject>() {
-        { ClassName.King, Resources.Load("Prefabs/Classes/King") as GameObject },
-        { ClassName.Queen, Resources.Load("Prefabs/Classes/Queen") as GameObject },
-        { ClassName.Rook, Resources.Load("Prefabs/Classes/Rook") as GameObject },
-        { ClassName.Bishop, Resources.Load("Prefabs/Classes/Bishop") as GameObject },
-        { ClassName.Knight, Resources.Load("Prefabs/Classes/Knight") as GameObject },
-        { ClassName.Pawn, Resources.Load("Prefabs/Classes/Pawn") as GameObject },
+        { ClassName.King,   Resources.Load<GameObject>("Prefabs/Classes/King")   },
+        { ClassName.Queen,  Resources.Load<GameObject>("Prefabs/Classes/Queen")  },
+        { ClassName.Rook,   Resources.Load<GameObject>("Prefabs/Classes/Rook")   },
+        { ClassName.Bishop, Resources.Load<GameObject>("Prefabs/Classes/Bishop") },
+        { ClassName.Knight, Resources.Load<GameObject>("Prefabs/Classes/Knight") },
+        { ClassName.Pawn,   Resources.Load<GameObject>("Prefabs/Classes/Pawn")   },
     };
 
     public static GameObject GetClassPrefab(ClassName className) {
         return classPrefabs[className];
     }
 
-    private ClassName className;
+    public ClassName ClassName {
+        get;
+    }
 
     public CharacterClass(ClassName _className) {
-        className = _className;
+        ClassName = _className;
     }
 
     public bool CanMove(Coords<int> start, Coords<int> end) {
-        switch (className) {
+        switch (ClassName) {
             case ClassName.King:
                 bool diagonal = IsDiagonalMove(start, end) && GetDiagonalLength(start, end) == 1;
                 bool orthogonal = IsOrthogonalMove(start, end) && GetOrthogonalLength(start, end) == 1;

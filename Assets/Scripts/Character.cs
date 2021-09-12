@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class Character: MonoBehaviour, IHasDetails
 {
@@ -15,6 +16,6 @@ public class Character: MonoBehaviour, IHasDetails
     }
 
     public string GetDetails() {
-        return string.Format("A {0} named {1}.", characterClass.ToString(), gameObject.name);
+        return string.Format("A {0} named {1}.", Enum.GetName(typeof(ClassName), characterClass.ClassName), gameObject.name);
     }
 }
