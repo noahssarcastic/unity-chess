@@ -1,38 +1,36 @@
 using System;
 using UnityEngine;
 
-/*
-    Makes TextMesh look sharp regardless of camera size/resolution
-    Do NOT change character size or font size; use scale only
-*/
-public class TextMeshSharpener:MonoBehaviour 
-{ 
-    // Properties
+
+/**
+ * Makes TextMesh look sharp regardless of camera size/resolution.
+ * Do NOT change character size or font size; use scale only.
+ * Source: http://answers.unity.com/answers/799174/view.html
+ */
+public class TextMeshSharpener: MonoBehaviour { 
 
     private float lastPixelHeight = -1;
     private TextMesh textMesh;
 
-    // MonoBehavior Methods
-
     void Start() {
         textMesh = GetComponent<TextMesh>();
-        resize();
+        Resize();
     }
 
     void Update() {
-        // Always resize in the editor, or when playing the game, only when the resolution changes
-        if (Camera.main.pixelHeight != lastPixelHeight || (Application.isEditor && !Application.isPlaying)) resize();
+        bool resolutionDidChange = Camera.main.pixelHeight != lastPixelHeight;
+        bool isEditorMode = (Application.isEditor && !Application.isPlaying);
+        if (resolutionDidChange || isEditorMode) Resize();
     }
 
-    // Helper functions
-
-    private void resize() {
-        float ph = Camera.main.pixelHeight;
-        float ch = Camera.main.orthographicSize;
-        float pixelRatio = (ch * 2.0f) / ph;
-        float targetRes = 128f;
-        textMesh.characterSize = pixelRatio * Camera.main.orthographicSize / Math.Max(transform.localScale.x, transform.localScale.y);
-        textMesh.fontSize = (int)Math.Round(targetRes / textMesh.characterSize);
-        lastPixelHeight = ph;
+    private void Resize() {
+        float pixelHeight = Camera.main.pixelHeight;
+        float cameraHalfSize = Camera.main.orthographicSize;
+        float pixelRatio = (cameraHalfSize * 2.0f) / pixelHeight;
+        float targetResolution = 128f;
+        float biggerDimension = Math.Max(transform.localScale.x, transform.localScale.y);
+        textMesh.characterSize = pixelRatio * cameraHalfSize / biggerDimension;
+        textMesh.fontSize = Mathf.RoundToInt(targetResolution / textMesh.characterSize);
+        lastPixelHeight = pixelHeight;
     }
 }

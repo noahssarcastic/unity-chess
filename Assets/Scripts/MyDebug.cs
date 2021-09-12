@@ -1,12 +1,12 @@
 using UnityEngine;
 
+
 public static class MyDebug {
 
     public static void DrawRect(Vector3 start, Vector3 end, Color color, float duration=0) {
         // Reset depth because square will only ever be coplanar with x-y plane.
         float depth = 0;
 
-        // Define vertices
         Vector3 vert1 = new Vector3(start.x, start.y, depth);
         Vector3 vert2 = new Vector3(start.x, end.y, depth);
         Vector3 vert3 = new Vector3(end.x, start.y, depth);
@@ -18,12 +18,15 @@ public static class MyDebug {
         Debug.DrawLine(vert3, vert4, color, duration);
     }
 
-    // C = segements * len
-    // 2 * pi * r = (360 / ang) * len
-    // r = (360 * len) / (ang * 2 * pi)
-    // r = (180 * len) / (ang * pi)
-    // 180 * len = r * ang * pi
-    // len = r * ang * pi / 180
+    /**
+     * Wrote my derivation here for proof.
+     * C = segements * len
+     * 2 * pi * r = (360 / ang) * len
+     * r = (360 * len) / (ang * 2 * pi)
+     * r = (180 * len) / (ang * pi)
+     * 180 * len = r * ang * pi
+     * len = r * ang * pi / 180
+     */
     public static void DrawCircle(Vector3 center, float radius, Color color, int segments=360, float duration=0) {
         float degreeIncrement = 360 / segments;
         float lineLength = radius * degreeIncrement * Mathf.PI / 180;
