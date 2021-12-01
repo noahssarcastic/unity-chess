@@ -8,30 +8,54 @@ public interface IHasDetails {
 
 
 public class ActionPrompt: MonoBehaviour {
+
     [SerializeField] TextMeshProUGUI prompt;
-    [SerializeField] TextMeshProUGUI choiceOne;
-    [SerializeField] TextMeshProUGUI choiceTwo;
-    [SerializeField] TextMeshProUGUI choiceThree;
-    [SerializeField] TextMeshProUGUI choiceFour;
-
-    public void Awake() {
-
-    }
+    [SerializeField] PromptChoice choiceOne;
+    [SerializeField] PromptChoice choiceTwo;
+    [SerializeField] PromptChoice choiceThree;
+    [SerializeField] PromptChoice choiceFour;
 
     public void Start() {
         Initialize();
         EventManager.AddListener(EventName.SelectTile, HandleSelectTile);
+        EventManager.AddListener(EventName.UnselectTile, HandleUnselectTile);
+
     }
 
     private void Initialize() {
-        prompt.text = "Prompting...";
-        choiceOne.text = "Choice 1";
-        choiceTwo.text = "Choice 2";
-        choiceThree.text = "Choice 3";
-        choiceFour.text = "Choice 4";
+        prompt.text = "Select a tile...";
+        choiceOne.SetChoice("");
+        choiceTwo.SetChoice("");
+        choiceThree.SetChoice("");
+        choiceFour.SetChoice("");
     }
 
     public void HandleSelectTile() {
-        prompt.text = GameManager.Instance.Board.GetSelectedObject().GetDetails();
+        IHasDetails selectedObject = GameManager.Instance.Board.GetSelectedObject();
+        prompt.text = selectedObject.GetDetails();
+        if (selectedObject is Character) {
+            choiceOne.SetChoice("Move", HandleChooseMove);
+            choiceTwo.SetChoice("Attack");
+            choiceThree.SetChoice("Special");
+            choiceFour.SetChoice("More...");
+        } else {
+            choiceOne.SetChoice("");
+            choiceTwo.SetChoice("");
+            choiceThree.SetChoice("");
+            choiceFour.SetChoice("");
+        }
+    }
+
+    public void HandleUnselectTile() {
+        IHasDetails selectedObject = GameManager.Instance.Board.GetSelectedObject();
+        prompt.text = "Select a tile...";
+        choiceOne.SetChoice("");
+        choiceTwo.SetChoice("");
+        choiceThree.SetChoice("");
+        choiceFour.SetChoice("");
+    }
+
+    public void HandleChooseMove() {
+        EventManager.Invoke(EventName.MoveSelectedCharacter);
     }
 }

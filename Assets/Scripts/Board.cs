@@ -1,20 +1,25 @@
 using UnityEngine;
 
 
+public enum BoardMode {
+    Selection,
+    Movement
+}
+
+
 public class Board : MonoBehaviour, ISaveable {
     
     private TileMap<int> characterMap;
     private Tile[,] tiles;
     private Coords<int> selectedTile;
     private bool isTileSelected;
-
     private Character[] characters;
     private int numCharacters;
-
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
     [SerializeField] private float tileSize = 1;
     [SerializeField] private GameObject tilePrefab;
+    private BoardMode currentMode;
 
     void Start() {
         characters = new Character[20];
@@ -24,6 +29,8 @@ public class Board : MonoBehaviour, ISaveable {
 
         selectedTile = new Coords<int>();
         isTileSelected = false;
+
+        currentMode = BoardMode.Selection;
 
         // Render board
         for (int i = 0; i < width; i++) {
@@ -73,7 +80,15 @@ public class Board : MonoBehaviour, ISaveable {
             Vector3 clickCoords = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
             Coords<int> clickedTile = characterMap.GetGridCoords(clickCoords + offset);
-            OnClick(clickedTile);
+            
+            switch (currentMode) {
+                case BoardMode.Selection:
+                    HandleSelectionClick(clickedTile);
+                    break;
+                case BoardMode.Movement:
+                    HandleMovementClick(clickedTile);
+                    break;
+            }
         }
     }
 
@@ -98,7 +113,7 @@ public class Board : MonoBehaviour, ISaveable {
         Unselect();
     }
 
-    private void OnClick(Coords<int> clickedTile) {
+    private void HandleSelectionClick(Coords<int> clickedTile) {
         if (!characterMap.InBounds(clickedTile)) {
             return;
         }
@@ -110,12 +125,21 @@ public class Board : MonoBehaviour, ISaveable {
         if (isTileSelected && isSameTile) {
             // Unselect tile
             Unselect();
+            EventManager.Invoke(EventName.UnselectTile);
         } else {
             // Select tile
             Unselect();
             SelectTile(clickedTile);
             EventManager.Invoke(EventName.SelectTile);
         }
+    }
+
+    private void HandleMovementClick(Coords<int> clickedTile) {
+        if (!characterMap.InBounds(clickedTile)) {
+            return;
+        }
+
+        
     }
 
     private Tile CreateTile(string name, Vector3 position, Vector3 scale) {

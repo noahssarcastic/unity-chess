@@ -5,7 +5,9 @@ using UnityEngine.Assertions;
 
 
 public enum EventName {
-    SelectTile
+    SelectTile,
+    UnselectTile,
+    MoveSelectedCharacter
 }
 
 
