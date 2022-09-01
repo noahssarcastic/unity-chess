@@ -1,1 +1,1 @@
-# chess2.0
+# unity-chess
